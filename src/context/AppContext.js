@@ -8,9 +8,11 @@ export const AppReducer = (state, action) => {
             let total_budget = 0;
             total_budget = state.expenses.reduce(
                 (previousExp, currentExp) => {
-                    return previousExp + currentExp.cost
+                    console.log('previousExp=', previousExp, 'currentExp=', currentExp);
+                    return previousExp + (currentExp.cost || 0)
                 },0
             );
+            console.log('action.payload', action.payload);
             total_budget = total_budget + action.payload.cost;
             action.type = "DONE";
             if(total_budget <= state.budget) {
@@ -25,7 +27,7 @@ export const AppReducer = (state, action) => {
                     ...state,
                 };
             } else {
-                alert("Cannot increase the allocation! Out of funds");
+                alert("Cannot increase the allocation! Out of funds" + total_budget +' > ' + state.budget);
                 return {
                     ...state
                 }
@@ -86,7 +88,14 @@ const initialState = {
         { id: "Human Resource", name: 'Human Resource', cost: 40 },
         { id: "IT", name: 'IT', cost: 500 },
     ],
-    currency: '£'
+    currency: '£',
+    currencyList: {
+        '£': 'Pound',
+        '$': 'Dollar',
+        '€': 'Euro',
+        '₹': 'Ruppee',
+    },
+    currencyListOrder: ['$','£','€','₹']
 };
 
 // 2. Creates the context this is the thing our components import and use to get the state
@@ -113,7 +122,9 @@ export const AppProvider = (props) => {
                 budget: state.budget,
                 remaining: remaining,
                 dispatch,
-                currency: state.currency
+                currency: state.currency,
+                currencyList: state.currencyList,
+                currencyListOrder: state.currencyListOrder,
             }}
         >
             {props.children}
